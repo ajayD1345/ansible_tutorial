@@ -1,0 +1,47 @@
+---
+- hosts: all
+  become: true
+  tasks:
+
+  - name: update repository index
+    yum:
+      update_cache: yes 
+
+  - name: install Apache HTTP server package
+    yum:
+      name: httpd
+      state: absent
+
+  - name: install PHP support for apache
+    yum:
+      name: php
+      state: absent
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#---
+
+#- hosts: all
+ # become: true
+ # tasks:
+
+# - name: update repository index
+ #   yum:
+  #    update_cache: yes 
+
+ #- name: install apache HTTP server package
+  #  yum:
+   #   name: httpd
+    #  state: present
