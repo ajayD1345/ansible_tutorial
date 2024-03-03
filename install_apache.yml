@@ -5,17 +5,20 @@
 
   - name: update repository index
     yum:
-      update_cache: yes 
+      update_cache: yes
+    when: ansible_distribution == "centos"
 
   - name: install Apache HTTP server package
     yum:
       name: httpd
       state: latest
+    when: ansible_distribution == "centos"
 
   - name: install PHP support for apache
     yum:
       name: php
       state: latest
+    when: ansible_distribution == "centos"
 
   - name: Check if Apache HTTP server is enabled
     shell: systemctl is-enabled httpd
@@ -30,29 +33,32 @@
       enabled: yes
     when: apache_enabled.stdout != "enabled"
 
+  - name: update repository index
+    apt:
+      update_cache: yes
+    when: ansible_distribution == "ubuntu"
 
+  - name: install apache2 package
+    apt:
+      name: apache2
+      state: latest
+    when: ansible_distribution == "ubuntu"
 
+  - name: add php suppport for apache
+    apt:
+      name: libapache2-mod-php
+      state: latest
+    when: ansible_distribution == "ubuntu"
 
+  - name: Check if Apache HTTP server is enabled
+    shell: systemctl is-enabled httpd
+    register: apache_enabled
+    changed_when: false
+    ignore_errors: true
 
-
-
-
-
-
-
-
-
-#---
-
-#- hosts: all
- # become: true
- # tasks:
-
-# - name: update repository index
- #   yum:
-  #    update_cache: yes 
-
- #- name: install apache HTTP server package
-  #  yum:
-   #   name: httpd
-    #  state: present
+  - name: Ensure Apache HTTP server is enabled and started if not enabled
+    systemd:
+      name: httpd
+      state: started
+      enabled: yes
+    when: apache_enabled.stdout != "enabled"
