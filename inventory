@@ -1,1 +1,1 @@
-vagrant@192.168.8.159
+vagrant@192.168.8.159 apache_package=httpd php_package=php
