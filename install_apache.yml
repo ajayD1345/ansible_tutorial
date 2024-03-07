@@ -3,20 +3,20 @@
   become: true
   tasks:
 
-  - name: install Apache HTTP server and PHP
-    package:
+  - name: install Apache HTTP server and PHP for CentOS servers
+    yum:
       name:
-        - "{{ apache_package }}"
-        - "{{ php_package }}"
+        - httpd
+        - php
       state: latest
       update_cache: yes
+    when: ansible_distribution == "CentOS"
 
   - name: Check if Apache HTTP server is enabled
     command: systemctl is-enabled httpd
     register: apache_enabled
     changed_when: false
     ignore_errors: true
-
 
   - name: Ensure Apache HTTP server is enabled and started if not enabled
     systemd:

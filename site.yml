@@ -1,0 +1,47 @@
+---
+- hosts: all
+  become: true
+  tasks:
+    - name: install updates (CentOS)
+      yum:
+        name: '*'
+        state: latest
+      when: ansible_distribution == "CentOS"
+
+    - name: install updates (Ubuntu)
+      apt:
+        upgrade: dist
+        update_cache: yes
+      when: ansible_distribution == "Ubuntu"
+
+- hosts: web_servers
+  become: true
+  tasks:
+    - name: install Apache HTTP server and PHP for CentOS
+      yum:
+        name:
+          - httpd
+          - php
+        state: latest
+      when: ansible_distribution == "CentOS"
+
+    - name: Check if Apache HTTP server is enabled
+      command: systemctl is-enabled httpd
+      register: apache_enabled
+      changed_when: false
+      ignore_errors: true
+
+    - name: Ensure Apache HTTP server is enabled and started if not enabled
+      systemd:
+        name: httpd
+        state: started
+        enabled: yes
+      when: apache_enabled.rc != 0
+
+    - name: install Apache HTTP server and PHP for Ubuntu
+      apt:
+        name:
+          - apache2
+          - libapache2-mod-php
+        state: latest
+      when: ansible_distribution == "Ubuntu"
