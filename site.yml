@@ -3,12 +3,14 @@
   become: true
   tasks:
     - name: install updates (CentOS)
+      tags: always
       yum:
         name: '*'
         state: latest
       when: ansible_distribution == "CentOS"
 
     - name: install updates (Ubuntu)
+      tags: always
       apt:
         upgrade: dist
         update_cache: yes
@@ -18,6 +20,7 @@
   become: true
   tasks:
     - name: install Apache HTTP server and PHP for CentOS
+      tags: apache,centos,http
       yum:
         name:
           - httpd
@@ -39,6 +42,7 @@
       when: apache_enabled.rc != 0
 
     - name: install Apache HTTP server and PHP for Ubuntu
+      tags: apache,apache2,ubuntu
       apt:
         name:
           - apache2
