@@ -1,0 +1,7 @@
+ - name: add ssh key from samaritan
+   authorized_key:
+        user: samaritan
+        key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL06We1TNaWt75qvGseu439F9qR4zLNL9ryRyaooEd4l ansible"
+
+
+

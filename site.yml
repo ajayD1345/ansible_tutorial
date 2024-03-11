@@ -1,7 +1,7 @@
 ---
 - hosts: all
   become: true
-  tasks:
+  pre_tasks:
 #    - name: update repo (CentOS)
  #     tags: always
   #    yum:
@@ -18,68 +18,20 @@
 
 - hosts: all
   become: true
-  tasks:
-    - name: add ssh key from samaritan
-      tags: always
-      authorized_key:
-        user: samaritan
-        key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL06We1TNaWt75qvGseu439F9qR4zLNL9ryRyaooEd4l ansible"
+  roles:
+    - base
 
-#- hosts: workstations
- # become: true
- # tasks:
-    - name: install unzip
-      package:
-        name: unzip
-
-    - name: install terraform
-      unarchive:
-        src: https://releases.hashicorp.com/terraform/1.7.4/terraform_1.7.4_linux_amd64.zip
-        dest: /usr/local/bin
-        remote_src: yes
-        mode: 0755
-        owner: root
-        group: root
+- hosts: workstations
+  become: true
+  roles:
+    - workstations
 
 - hosts: web_servers
   become: true
-  tasks:
-    - name: install Apache HTTP server and PHP for CentOS
-      tags: apache,centos,http
-      yum:
-        name:
-          - httpd
-          - php
-        state: latest
-      when: ansible_distribution == "CentOS"
+  roles:
+    - web_servers
 
-    - name: Check if Apache HTTP server is enabled
-      command: systemctl is-enabled httpd
-      register: apache_enabled
-      changed_when: false
-      ignore_errors: true
-
-    - name: Ensure Apache HTTP server is enabled and started if not enabled
-      systemd:
-        name: httpd
-        state: started
-        enabled: yes
-      when: apache_enabled.rc != 0
-
-    - name: install Apache HTTP server and PHP for Ubuntu
-      tags: apache,apache2,ubuntu
-      apt:
-        name:
-          - apache2
-          - libapache2-mod-php
-        state: latest
-      when: ansible_distribution == "Ubuntu"
-
-    - name: copy default html file for site
-      tags: apache,centos,http
-      copy:
-        src: default_site.html
-        dest: /var/www/html/index.html
-        owner: root
-        group: root
-        mode: 0644 
+- hosts: db_servers
+  become: true
+  roles:
+    - db_servers
