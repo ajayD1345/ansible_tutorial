@@ -1,11 +1,11 @@
 - name: install Apache HTTP server and PHP for CentOS
-  tags: apache,centos,http
-  yum:
+  tags: apache,httpd,php
+  package:
      name:
-        - httpd
-        - php
+        - "{{ apache_package_name }}"
+        - "{{ php_package_name }}"
      state: latest
-  when: ansible_distribution == "CentOS"
+
 
 - name: Check if Apache HTTP server is enabled
   command: systemctl is-enabled httpd
@@ -15,22 +15,13 @@
 
 - name: Ensure Apache HTTP server is enabled and started if not enabled
   systemd:
-      name: httpd
+      name: "{{ apache_service }}"
       state: started
       enabled: yes
   when: apache_enabled.rc != 0
 
-- name: install Apache HTTP server and PHP for Ubuntu
-  tags: apache,apache2,ubuntu
-  apt:
-    name:
-      - apache2
-      - libapache2-mod-php
-    state: latest
-  when: ansible_distribution == "Ubuntu"
-
 - name: copy default html file for site
-  tags: apache,centos,http
+  tags: apache,apache,apache2,httpd
   copy:
     src: default_site.html
     dest: /var/www/html/index.html
